@@ -1,0 +1,61 @@
+---
+- hosts: taiko_nodes
+  become: true
+  tasks:
+    - name: Update system packages
+      apt:
+        update_cache: yes
+
+    - name: Configure firewall rules
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+      loop:
+        - "22"
+        # Add other required ports here
+
+    - name: Clone Taiko Node repository and configure environment
+      git:
+        repo: https://github.com/taikoxyz/simple-taiko-node
+        dest: /home/{{ ansible_user }}/simple-taiko-node
+      become_user: "{{ ansible_user }}"
+      register: taiko_node_cloned
+
+    - name: Copy .env file
+      command: "cp /home/{{ ansible_user }}/simple-taiko-node/.env.sample /home/{{ ansible_user }}/simple-taiko-node/.env"
+      become_user: "{{ ansible_user }}"
+      when: taiko_node_cloned.changed
+
+    # Add task to fill .env file
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    # Add tasks to start Docker and enable Docker service
+
+    - name: Run Taiko Node using Docker Compose
+      command: "docker-compose up -d"
+      args:
+        chdir: "/home/{{ ansible_user }}/simple-taiko-node"
+      become_user: "{{ ansible_user }}"
+
+- hosts: taiko_dashboard
+  become: true
+  tasks:
+    - name: Change to home directory and create Tmux session
+      shell: "cd ~ && tmux new-session -d -s taikoDashboard"
+
+    - name: Clone Taiko Node Dashboard repository
+      git:
+        repo: https://github.com/dojonode/taiko-node-dashboard-docker
+        dest: /home/{{ ansible_user }}/taiko-node-dashboard-docker
+      become_user: "{{ ansible_user }}"
+
+    - name: Start Taiko Dashboard using Docker Compose
+      command: "docker-compose up -d"
+      args:
+        chdir: "/home/{{ ansible_user }}/taiko-node-dashboard-docker"
+      become_user: "{{ ansible_user }}"
+
