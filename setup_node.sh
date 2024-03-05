@@ -2,15 +2,13 @@
 
 cd simple-taiko-node
 
-# Prompt user for input
-read -p "Enter L1 HTTP endpoint: " L1_ENDPOINT_HTTP
-read -p "Enter L1 WS endpoint: " L1_ENDPOINT_WS
-read -p "Enable proposer (true/false): " ENABLE_PROPOSER
-if [[ $ENABLE_PROPOSER == "true" ]]; then
-    read -p "Enter L1 proposer private key: " L1_PROPOSER_PRIVATE_KEY
-    read -p "Enter propose block gas limit: " PROPOSE_BLOCK_TX_GAS_LIMIT
-    read -p "Enter block proposal fee: " BLOCK_PROPOSAL_FEE
-fi
+# Accepting inputs from command-line arguments
+L1_ENDPOINT_HTTP=$1
+L1_ENDPOINT_WS=$2
+ENABLE_PROPOSER=$3
+L1_PROPOSER_PRIVATE_KEY=$4
+PROPOSE_BLOCK_TX_GAS_LIMIT=$5
+BLOCK_PROPOSAL_FEE=$6
 
 # Update the environment file
 sed -i "s|^L1_ENDPOINT_HTTP=.*|L1_ENDPOINT_HTTP=$L1_ENDPOINT_HTTP|" .env.sample
@@ -22,14 +20,12 @@ if [[ $ENABLE_PROPOSER == "true" ]]; then
     sed -i "s|^BLOCK_PROPOSAL_FEE=.*|BLOCK_PROPOSAL_FEE=$BLOCK_PROPOSAL_FEE|" .env.sample
 fi
 
-#Copy .env.sample file to .env
-
+# Copy .env.sample file to .env
 cp .env.sample .env
 
 echo "Environment file updated successfully."
 
 # Starting the node
-
 docker-compose up -d
 
 echo "Node started running successfully"
