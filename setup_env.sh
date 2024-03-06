@@ -50,9 +50,9 @@ git clone https://github.com/dojonode/taiko-node-dashboard-docker.git
 sudo apt install git -y
 
 # Remove Docker-related packages
-for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
-    sudo apt-get remove $pkg -y
-done
+#for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
+#    sudo apt-get remove $pkg -y
+#done
 
 # Install Docker
 sudo apt-get install docker.io -y
